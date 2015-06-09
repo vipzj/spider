@@ -1,5 +1,6 @@
 package com.liuy202;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,8 @@ public class SpiderController extends WebMvcConfigurerAdapter {
 	@Bean
 	public InternalResourceViewResolver viewResolver() {
 		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+
+
 
 		resolver.setPrefix("/WEB-INF/views/");
 		resolver.setSuffix(".jsp");

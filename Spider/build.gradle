@@ -27,6 +27,7 @@ repositories {
 }
 
 dependencies {
+    compile ('commons-io:commons-io:2.4')
 	compile ('org.jodd:jodd-lagarto:3.6.1')
 	compile ('org.apache.httpcomponents:httpclient:4.3.+')
 	compile ('org.apache.commons:commons-lang3:3.+')
