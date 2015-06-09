@@ -1,0 +1,68 @@
+import java.lang.invoke.LambdaForm.Compiled;
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+
+sourceCompatibility = 1.8
+version = '1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Spring Spider Example', 'Implementation-Version': version
+    }
+}
+
+eclipse
+{
+	classpath
+	{
+		downloadJavadoc = true
+		downloadSources = true
+	}
+}
+
+sourceSets
+{
+	main
+	{
+		java
+		{
+			srcDir 'src'
+		}
+		resources
+		{
+			srcDir 'src'
+		}
+	}
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	compile ('org.jodd:jodd-lagarto:3.6.1')
+	compile ('org.apache.httpcomponents:httpclient:4.3.+')
+	compile ('org.apache.commons:commons-lang3:3.+')
+	compile ('org.springframework:spring-context:4.1.1.RELEASE')
+	compile("org.springframework.boot:spring-boot-starter-web:1.2.4.RELEASE")
+	compile("org.thymeleaf:thymeleaf-spring4")
+	compile("org.apache.lucene:lucene-core:4.+")
+	compile("org.apache.lucene:lucene-analyzers-common:4.+")
+	compile("org.jsoup:jsoup:1.8.2")
+	compile group: 'commons-collections', name: 'commons-collections', version: '3.+'
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+	
+}
+
+test {
+    systemProperties 'property': 'value'
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}
