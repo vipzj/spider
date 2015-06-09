@@ -21,20 +21,6 @@ eclipse
 	}
 }
 
-sourceSets
-{
-	main
-	{
-		java
-		{
-			srcDir 'src'
-		}
-		resources
-		{
-			srcDir 'src'
-		}
-	}
-}
 
 repositories {
     mavenCentral()
