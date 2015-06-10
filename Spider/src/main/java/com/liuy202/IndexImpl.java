@@ -1,19 +1,17 @@
 package com.liuy202;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
-import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -36,38 +34,20 @@ public class IndexImpl implements Index {
 	public void index(String content, String uri) {
 		// TODO Auto-generated method stub
 		try {
-			CharArraySet stopwords = new CharArraySet(new ArrayList(), true /*
-																			 * ignore
-																			 * case
-																			 */);
-			BufferedReader sw = new BufferedReader(new FileReader(
-					"english.stop"));
-
-			/* read in the stop words file from the Lucene distribution */
-
-			while (true) {
-				String temp = sw.readLine();
-				if (temp != null) {
-					stopwords.add(temp);
-				} else
-					break;
-			}
-			sw.close();
-
-			Analyzer analyzer = new EnglishAnalyzer(stopwords);
+			Analyzer analyzer = new StandardAnalyzer();
 
 			IndexWriterConfig conf = new IndexWriterConfig(Version.LATEST,
 					analyzer);
 			SimpleFSDirectory simpleFSDirectory = new SimpleFSDirectory(
-					new File("c:/temp/lucene.dat"));
-			IndexWriter writer = new IndexWriter(simpleFSDirectory, conf);
+					new File("c:/temp/lucene.index"));
 
-			content = removeHtmlTag(content);
+			IndexWriter writer = new IndexWriter(simpleFSDirectory, conf);
 			Document doc = new Document();
+			content = removeHtmlTag(content);
 			doc.add(new TextField("content", content, Store.YES));
 			doc.add(new StoredField("uri", uri));
-
 			writer.addDocument(doc);
+			writer.close();
 		} catch (CorruptIndexException e) {
 			e.printStackTrace();
 		} catch (LockObtainFailedException e) {
@@ -82,38 +62,15 @@ public class IndexImpl implements Index {
 	public String search(String searchContent) {
 		// TODO Auto-generated method stub
 
-		CharArraySet stopwords = new CharArraySet(new ArrayList(), true /*
-																		 * ignore
-																		 * case
-																		 */);
-		BufferedReader sw;
-		try {
-			sw = new BufferedReader(new FileReader("english.stop"));
-
-			/* read in the stop words file from the lucene distribution */
-
-			while (true) {
-				String temp = sw.readLine();
-				if (temp != null) {
-					stopwords.add(temp);
-				} else
-					break;
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		Analyzer analyzer = new EnglishAnalyzer(stopwords);
 		String result = "";
 		try {
+			Analyzer analyzer = new StandardAnalyzer();
+			SimpleFSDirectory simpleFSDirectory = new SimpleFSDirectory(
+					new File("c:/temp/lucene.index"));
 			QueryBuilder builder = new QueryBuilder(analyzer);
 			Query q = builder.createPhraseQuery("content", searchContent);
 
 			int hitsPerPage = 10;
-			SimpleFSDirectory simpleFSDirectory = new SimpleFSDirectory(
-					new File("c:/temp/lucene.dat"));
-
 			IndexReader reader = DirectoryReader.open(simpleFSDirectory);
 
 			IndexSearcher searcher = new IndexSearcher(reader);
@@ -130,8 +87,9 @@ public class IndexImpl implements Index {
 				ScoreDoc hit = hits[i];
 				int docId = hit.doc;
 				Document d = searcher.doc(docId);
-				System.out.println((i + 1) + ". " + d.get("uri"));
-				result += d.get("uri") + "\n";
+				String oneUri = d.get("uri");
+				System.out.println((i + 1) + ". " + oneUri);
+				result += "<p><a href='"+d.get("uri") + "'>"+d.get("uri")+"</a></p>";
 			}
 
 		} catch (IOException e) {
@@ -154,9 +112,9 @@ public class IndexImpl implements Index {
 		java.util.regex.Pattern p_special;
 		java.util.regex.Matcher m_special;
 		try {
-			// define the regex of script{»ò<script[^>]*?>[\\s\\S]*?<\\/script>
+			// define the regex of script{or <script[^>]*?>[\\s\\S]*?<\\/script>
 			String regEx_script = "<[\\s]*?script[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?script[\\s]*?>";
-			// define the regex of style{»ò<style[^>]*?>[\\s\\S]*?<\\/style>
+			// define the regex of style{or <style[^>]*?>[\\s\\S]*?<\\/style>
 			String regEx_style = "<[\\s]*?style[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?style[\\s]*?>";
 			// define the regex of tags
 			String regEx_html = "<[^>]+>";

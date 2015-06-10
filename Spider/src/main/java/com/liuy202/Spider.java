@@ -26,7 +26,7 @@ public class Spider {
 	public void startCrawl()
 	{
 		try {
-			crawl(new URI("http://www.unitec.ac.nz/"),20);
+			crawl(new URI("http://www.unitec.ac.nz/"),5);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -40,14 +40,16 @@ public class Spider {
 			return;
 		}
 		
-		System.out.println(uri);
+
 		StringBuilder messageResponse = new StringBuilder();
 		
 		if(client.get(uri, messageResponse)){
-			List<URI> uris = parser.parseLinks(messageResponse.toString(), uri.getHost());
-			
+			System.out.println("downloading finished! ");
+			List<URI> uris = parser.parseLinks(uri.toString());
+			System.out.println("parsing finished! ");
 			//index page content in lucene
-			index.index(messageResponse.toString(), uri.toString());
+			if(!alreadyVisited.contains(uri))
+				index.index(messageResponse.toString(), uri.toString());
 			for(URI request: uris){
 				if(!alreadyVisited.contains(request)){
 					alreadyVisited.add(request);

@@ -6,7 +6,7 @@
 </head>
 <body>
 <h4>Crawling complete!</h4>
-<form method="post" action="search">
+<form method="post" action="searchInLucene">
 <input type="text" name="searchContent"></input>
 <input type="submit" value="Search"></input>
 </form>

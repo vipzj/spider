@@ -20,6 +20,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @EnableWebMvc
 public class SpiderController extends WebMvcConfigurerAdapter {
 
+	Spider spider;
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
@@ -67,17 +68,23 @@ public class SpiderController extends WebMvcConfigurerAdapter {
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/crawling")
 	public String crawling(){
-		Spider spider = getSpider();
+		spider = getSpider();
 		spider.startCrawl();
-		return "search";
+		return "redirect:/search";
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/search")
+	public String search(){
+		 
+		return "search";
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/searchInLucene")
 	@ResponseBody
-	public String search(String searchContent){
-		Index index = new IndexImpl();
+	public String searchInLucene(String searchContent){
+		Index index = getIndex();
 		String result =index.search(searchContent);
-		return "<p>"+result+"</p>";
+		return result;
 	}
 	public static void main(String[] args)
 	{

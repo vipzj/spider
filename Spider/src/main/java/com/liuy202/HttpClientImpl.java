@@ -1,12 +1,12 @@
 package com.liuy202;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,25 +19,28 @@ public class HttpClientImpl implements HttpClient
 		boolean exist = false;
 		//TODO implement org.apache.http.client.HttpClient
 		try {
+			
+			
+//			System.out.println("aaa "+uri);
 			URL u = uri.toURL();
+			
 			is = u.openStream();
-			DataInputStream dis = new DataInputStream(new BufferedInputStream(is));
+			
+			List<String> lists = IOUtils.readLines(is);
 			String s = "";
-			while ((s+=dis.readUTF())!= null) {	
+			if(lists.size()!=0){
 				exist = true;
-	         }
-			response = new StringBuilder(s);
-		} catch (Exception e) {
+			}
+			for(String line:lists){
+				response.append(line);
+			}
+			is.close();
+			
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}finally{
-			 try {
-				is.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
+		
 		return exist;
 	}
 
